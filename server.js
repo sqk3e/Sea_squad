@@ -61,13 +61,11 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Получить всех пользователей
 app.get('/api/users', async (req, res) => {
   const result = await pool.query('SELECT id, username, emoji, rank, status, medal FROM users ORDER BY created_at');
   res.json(result.rows);
 });
 
-// Получить посты
 app.get('/api/posts', async (req, res) => {
   const result = await pool.query(`
     SELECT p.*, u.username, u.emoji, u.rank, u.status, u.medal,
@@ -79,7 +77,6 @@ app.get('/api/posts', async (req, res) => {
   res.json(result.rows);
 });
 
-// Добавить пост
 app.post('/api/posts', async (req, res) => {
   const { user_id, content } = req.body;
   const result = await pool.query(
@@ -89,7 +86,6 @@ app.post('/api/posts', async (req, res) => {
   res.json({ id: result.rows[0].id });
 });
 
-// Реакция
 app.post('/api/reactions', async (req, res) => {
   const { post_id, user_id, type } = req.body;
   await pool.query(
@@ -99,14 +95,12 @@ app.post('/api/reactions', async (req, res) => {
   res.json({ success: true });
 });
 
-// Обновить статус
 app.post('/api/set-status', async (req, res) => {
   const { user_id, status } = req.body;
   await pool.query('UPDATE users SET status = $1 WHERE id = $2', [status, user_id]);
   res.json({ success: true });
 });
 
-// Выдать медаль (только админ)
 app.post('/api/give-medal', async (req, res) => {
   const { admin_id, user_id, medal } = req.body;
   const admin = await pool.query('SELECT is_admin FROM users WHERE id = $1', [admin_id]);
@@ -118,7 +112,6 @@ app.post('/api/give-medal', async (req, res) => {
   }
 });
 
-// Статистика (только админ)
 app.post('/api/stats', async (req, res) => {
   const { admin_id } = req.body;
   const admin = await pool.query('SELECT is_admin FROM users WHERE id = $1', [admin_id]);
