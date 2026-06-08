@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SEA SQUAD • Social</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #f5f5f5;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .left-symbol { font-size: 28px; }
+        .center-title { font-size: 24px; font-weight: bold; text-align: center; }
+        .right-symbol { font-size: 24px; }
+        .status {
+            background: white;
+            padding: 12px;
+            border-radius: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+            font-size: 14px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .post-form {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .post-form textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 16px;
+            resize: vertical;
+        }
+        .post-form button {
+            margin-top: 10px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            width: 100%;
+        }
+        .post {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .post-author {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .sqke-name {
+            background: linear-gradient(45deg, gold, orange);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: bold;
+        }
+        .medal { font-size: 14px; }
+        .dimair-status { font-size: 12px; color: #888; }
+        .post-time { font-size: 11px; color: #888; }
+        .post-content { margin: 12px 0; word-break: break-word; }
+        .reactions { display: flex; gap: 15px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #eee; }
+        .reaction-btn { background: none; border: none; font-size: 18px; cursor: pointer; }
+        .profile-status-toggle { margin: 10px 0; display: flex; align-items: center; gap: 10px; }
+        .status-badge {
+            background: #e0e0e0;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .profile-card {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+        }
+        .admin-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin-left: 10px;
+        }
+        .hidden-section { display: none; }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .nav-btn {
+            flex: 1;
+            background: #e0e0e0;
+            border: none;
+            padding: 10px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .nav-btn.active { background: #2e7d32; color: white; }
+        .stats-card {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        .stats-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #2e7d32;
+        }
+        .stats-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        @media (max-width: 600px) {
+            .header { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="left-symbol">🏎️💨</div>
+    <div class="center-title">SEA SQUAD 🦑🐋</div>
+    <div class="right-symbol"></div>
+</div>
+
+<div id="status" class="status">🔄 Загрузка...</div>
+
+<div class="nav-buttons" id="navButtons">
+    <button class="nav-btn active" data-section="feed">📰 Лента</button>
+    <button class="nav-btn" data-section="profile">👤 Профиль</button>
+    <button class="nav-btn" data-section="users">👥 Команда</button>
+    <button id="statsNavBtn" class="nav-btn" data-section="stats" style="display: none;">📊 Статистика</button>
+</div>
+
+<!-- Лента -->
+<div id="feedSection">
+    <div class="post-form">
+        <textarea id="postContent" placeholder="Что нового?"></textarea>
+        <button id="submitPost">Опубликовать</button>
+    </div>
+    <div id="feed"></div>
+</div>
+
+<!-- Профиль -->
+<div id="profileSection" class="hidden-section">
+    <div class="profile-card">
+        <div id="profileInfo"></div>
+        <div class="profile-status-toggle">
+            <span>Статус "Дима воздух":</span>
+            <button id="toggleStatusBtn" class="status-badge">Включить</button>
+        </div>
+        <div id="adminPanel" style="margin-top: 20px; display: none;">
+            <h4>Админ-панель</h4>
+            <input type="text" id="medalUsername" placeholder="Ник пользователя" style="width: 100%; margin-bottom: 8px; padding: 8px;">
+            <input type="text" id="medalName" placeholder="Название медали" style="width: 100%; margin-bottom: 8px; padding: 8px;">
+            <button id="giveMedalBtn" class="status-badge" style="background: #2e7d32; color: white;">Выдать медаль</button>
+        </div>
+    </div>
+</div>
+
+<!-- Команда -->
+<div id="usersSection" class="hidden-section">
+    <div id="usersList"></div>
+</div>
+
+<!-- Статистика -->
+<div id="statsSection" class="hidden-section">
+    <div class="stats-card">
+        <div class="stats-number" id="totalUsers">0</div>
+        <div class="stats-label">Всего пользователей</div>
+    </div>
+    <div class="stats-card">
+        <div class="stats-number" id="totalPosts">0</div>
+        <div class="stats-label">Всего постов</div>
+    </div>
+    <div class="stats-card">
+        <div class="stats-number" id="mostActiveUser">-</div>
+        <div class="stats-label">Самый активный</div>
+    </div>
+    <div class="stats-card">
+        <div id="topPostsList"></div>
+    </div>
+    <div class="stats-card">
+        <div id="topClan"></div>
+    </div>
+</div>
+
+<script>
+    let currentUser = null;
+    let isAdmin = false;
+    let currentSection = 'feed';
+    let posts = [];
+    let statsData = null;
+
+    async function register() {
+        const username = prompt("Введи свой ник:", "SQKE");
+        if (!username) return;
+        
+        const res = await fetch('/api/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+        });
+        
+        if (res.ok) {
+            currentUser = await res.json();
+            isAdmin = currentUser.isAdmin;
+            localStorage.setItem('userId', currentUser.id);
+            localStorage.setItem('isAdmin', isAdmin);
+            document.getElementById('status').innerHTML = `✅ Добро пожаловать, ${username}! ${isAdmin ? '👑 Админ' : ''}`;
+            if (isAdmin) {
+                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('statsNavBtn').style.display = 'block';
+                loadStats();
+            }
+            loadPosts();
+            loadUsers();
+        } else {
+            alert("Ник уже занят. Попробуй другой.");
+            register();
+        }
+    }
+
+    async function loadStats() {
+        if (!isAdmin || !currentUser) return;
+        const res = await fetch('/api/stats', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin_id: currentUser.id })
+        });
+        if (res.ok) {
+            statsData = await res.json();
+            renderStats();
+        }
+    }
+
+    function renderStats() {
+        if (!statsData) return;
+        document.getElementById('totalUsers').innerText = statsData.totalUsers;
+        document.getElementById('totalPosts').innerText = statsData.totalPosts;
+        document.getElementById('mostActiveUser').innerHTML = statsData.mostActiveUser 
+            ? `${statsData.mostActiveUser.username} (${statsData.mostActiveUser.post_count} постов)`
+            : 'Нет данных';
+        
+        const topPostsDiv = document.getElementById('topPostsList');
+        if (statsData.topPosts && statsData.topPosts.length) {
+            topPostsDiv.innerHTML = '<div class="stats-label" style="margin-bottom: 8px;">🏆 Топ постов</div>';
+            statsData.topPosts.forEach((post, idx) => {
+                topPostsDiv.innerHTML += `<div class="stats-row">${idx+1}. ${escapeHtml(post.username)}: "${post.content.substring(0, 50)}..." ❤️ ${post.reaction_count}</div>`;
+            });
+        } else {
+            topPostsDiv.innerHTML = '<div class="stats-label">Нет постов</div>';
+        }
+        
+        const clanDiv = document.getElementById('topClan');
+        if (statsData.topClan) {
+            clanDiv.innerHTML = `<div class="stats-number">${statsData.topClan.emoji}</div>
+                                  <div class="stats-label">Самый популярный клан (${statsData.topClan.count} чел)</div>`;
+        } else {
+            clanDiv.innerHTML = '<div class="stats-label">Нет данных о кланах</div>';
+        }
+    }
+
+    async function loadPosts() {
+        const res = await fetch('/api/posts');
+        posts = await res.json();
+        renderFeed();
+    }
+
+    async function loadUsers() {
+        const res = await fetch('/api/users');
+        const users = await res.json();
+        renderUsers(users);
+        renderProfile();
+    }
+
+    function renderFeed() {
+        const feedDiv = document.getElementById('feed');
+        if (!posts.length) {
+            feedDiv.innerHTML = '<div class="post">📭 Нет постов. Напиши первый!</div>';
+            return;
+        }
+        feedDiv.innerHTML = posts.map(post => `
+            <div class="post">
+                <div class="post-header">
+                    <div class="post-author">
+                        ${post.emoji || '🐟'} 
+                        <span class="${post.username === 'SQKE' ? 'sqke-name' : ''}">${escapeHtml(post.username)}</span>
+                        ${post.medal ? `<span class="medal">🏅 ${escapeHtml(post.medal)}</span>` : ''}
+                        ${post.status === 'dimair' ? '<span class="dimair-status">💨 Дима воздух</span>' : ''}
+                    </div>
+                    <div class="post-time">${new Date(post.created_at).toLocaleString()}</div>
+                </div>
+                <div class="post-content">${escapeHtml(post.content)}</div>
+                <div class="reactions">
+                    <button class="reaction-btn" onclick="react(${post.id}, 'like')">❤️ ${post.reaction_count || 0}</button>
+                    <button class="reaction-btn" onclick="react(${post.id}, 'mustache')">🧔🏻‍♂️ Усики</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function react(postId, type) {
+        if (!currentUser) return;
+        await fetch('/api/reactions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ post_id: postId, user_id: currentUser.id, type })
+        });
+        loadPosts();
+    }
+
+    async function submitPost() {
+        const content = document.getElementById('postContent').value;
+        if (!content.trim()) return;
+        await fetch('/api/posts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: currentUser.id, content })
+        });
+        document.getElementById('postContent').value = '';
+        loadPosts();
+        if (isAdmin) loadStats();
+    }
+
+    async function toggleStatus() {
+        const newStatus = currentUser.status === 'dimair' ? '' : 'dimair';
+        await fetch('/api/set-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: currentUser.id, status: newStatus })
+        });
+        currentUser.status = newStatus;
+        loadUsers();
+        renderProfile();
+    }
+
+    async function giveMedal() {
+        const username = document.getElementById('medalUsername').value;
+        const medal = document.getElementById('medalName').value;
+        if (!username || !medal) return;
+        
+        const usersRes = await fetch('/api/users');
+        const users = await usersRes.json();
+        const targetUser = users.find(u => u.username === username);
+        if (!targetUser) {
+            alert('Пользователь не найден');
+            return;
+        }
+        
+        await fetch('/api/give-medal', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ admin_id: currentUser.id, user_id: targetUser.id, medal })
+        });
+        loadUsers();
+        if (isAdmin) loadStats();
+    }
+
+    function renderUsers(users) {
+        const usersDiv = document.getElementById('usersList');
+        usersDiv.innerHTML = users.map(u => `
+            <div class="post">
+                <div class="post-author">
+                    ${u.emoji || '🐟'} ${escapeHtml(u.username)} 
+                    ${u.username === 'SQKE' ? '👑' : ''}
+                    ${u.medal ? `🏅 ${escapeHtml(u.medal)}` : ''}
+                    ${u.status === 'dimair' ? '💨 Дима воздух' : ''}
+                </div>
+                <div class="post-time">Ранг: ${u.rank}</div>
+            </div>
+        `).join('');
+    }
+
+    function renderProfile() {
+        if (!currentUser) return;
+        const profileDiv = document.getElementById('profileInfo');
+        profileDiv.innerHTML = `
+            <div class="post-author" style="font-size: 24px;">
+                ${currentUser.emoji || '🐟'} 
+                <span class="${currentUser.username === 'SQKE' ? 'sqke-name' : ''}">${escapeHtml(currentUser.username)}</span>
+            </div>
+            <div>Ранг: ${currentUser.rank || 'Новичок'}</div>
+            <div>${currentUser.medal ? `Медаль: 🏅 ${currentUser.medal}` : 'Нет медалей'}</div>
+            <div>${currentUser.status === 'dimair' ? '💨 Режим "Дима воздух" активен' : '😇 Режим "Дима воздух" выключен'}</div>
+        `;
+        const toggleBtn = document.getElementById('toggleStatusBtn');
+        toggleBtn.textContent = currentUser.status === 'dimair' ? 'Выключить' : 'Включить';
+    }
+
+    function switchSection(section) {
+        currentSection = section;
+        document.getElementById('feedSection').classList.add('hidden-section');
+        document.getElementById('profileSection').classList.add('hidden-section');
+        document.getElementById('usersSection').classList.add('hidden-section');
+        document.getElementById('statsSection').classList.add('hidden-section');
+        
+        if (section === 'feed') document.getElementById('feedSection').classList.remove('hidden-section');
+        if (section === 'profile') document.getElementById('profileSection').classList.remove('hidden-section');
+        if (section === 'users') document.getElementById('usersSection').classList.remove('hidden-section');
+        if (section === 'stats') {
+            document.getElementById('statsSection').classList.remove('hidden-section');
+            if (isAdmin && statsData) renderStats();
+        }
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-section') === section) btn.classList.add('active');
+        });
+        
+        if (section === 'profile') renderProfile();
+        if (section === 'users') loadUsers();
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    }
+
+    // Обработчики
+    document.getElementById('submitPost').onclick = submitPost;
+    document.getElementById('toggleStatusBtn').onclick = toggleStatus;
+    document.getElementById('giveMedalBtn').onclick = giveMedal;
+    
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.onclick = () => switchSection(btn.getAttribute('data-section'));
+    });
+
+    const savedId = localStorage.getItem('userId');
+    if (savedId) {
+        fetch('/api/users').then(r => r.json()).then(users => {
+            const user = users.find(u => u.id == savedId);
+            if (user) {
+                currentUser = user;
+                isAdmin = user.is_admin;
+                if (isAdmin) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('statsNavBtn').style.display = 'block';
+                    loadStats();
+                }
+                document.getElementById('status').innerHTML = `✅ С возвращением, ${user.username}!`;
+                loadPosts();
+                loadUsers();
+                return;
+            }
+            register();
+        });
+    } else {
+        register();
+    }
+</script>
+</body>
+</html>
